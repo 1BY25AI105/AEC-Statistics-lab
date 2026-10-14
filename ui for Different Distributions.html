@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discrete Probability Distributions</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 18px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #111827;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    nav button {
+      border: none;
+      background: transparent;
+      padding: 9px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #4b5563;
+    }
+    nav button:hover, nav button.active {
+      background: #eef2ff;
+      color: #4338ca;
+    }
+    main {
+      max-width: 1000px;
+      margin: 45px auto;
+      padding: 0 20px;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .hero h2 {
+      margin-bottom: 10px;
+      font-size: 32px;
+      color: #111827;
+    }
+    .hero p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 16px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #111827;
+    }
+    .formula {
+      background: #f8fafc;
+      border-left: 4px solid #4f46e5;
+      padding: 15px;
+      margin: 18px 0;
+      font-family: Georgia, serif;
+      font-size: 18px;
+      text-align: center;
+    }
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4f46e5;
+    }
+    .calculate {
+      margin-top: 22px;
+      padding: 11px 20px;
+      border: none;
+      border-radius: 7px;
+      background: #4f46e5;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .calculate:hover { background: #4338ca; }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 7px;
+      background: #eef2ff;
+      color: #312e81;
+      font-weight: 600;
+      display: none;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 18px 14px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .stat-card h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+    }
+    @media (max-width: 850px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    .chart-container {
+      margin-top: 22px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 22px;
+      overflow: hidden;
+    }
+    .chart-container h3 {
+      margin: 0 0 6px;
+    }
+    .chart-subtitle {
+      margin: 0 0 16px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    #pmfChart, #poissonPmfChart, #geomPmfChart {
+      width: 100%;
+      height: 360px;
+      display: block;
+      overflow: visible;
+    }
+    .chart-tooltip {
+      position: fixed;
+      display: none;
+      pointer-events: none;
+      background: #111827;
+      color: #ffffff;
+      padding: 9px 11px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.45;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .placeholder {
+      text-align: center;
+      padding: 70px 20px;
+    }
+    .placeholder h2 { margin-bottom: 10px; }
+    .placeholder p { color: #6b7280; }
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      .inputs { grid-template-columns: 1fr; }
+      header { justify-content: center; }
+      .hero h2 { font-size: 27px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Discrete Probability Distributions</h1>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
+    <button class="nav-btn" onclick="showPage('binomial', this)">Binomial</button>
+    <button class="nav-btn" onclick="showPage('poisson', this)">Poisson</button>
+    <button class="nav-btn" onclick="showPage('geometric', this)">Geometric</button>
+  </nav>
+</header>
+
+<main>
+  <section id="home" class="page">
+    <div class="hero">
+      <h2>Discrete Probability Distributions</h2>
+      <p>Educational laboratory application for undergraduate AIML students.</p>
+    </div>
+
+    <div class="card">
+      <h3>Laboratory Modules</h3>
+      <p>This application provides an interactive introduction to discrete probability distributions.</p>
+      <ul>
+        <li><strong>Binomial Distribution</strong> — Available[cite: 1]</li>
+        <li><strong>Poisson Distribution</strong> — Available</li>
+        <li><strong>Geometric Distribution</strong> — Available</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="binomial" class="page" style="display:none;">
+    <div class="hero">
+      <h2>Binomial Distribution</h2>
+      <p>Calculate the probability of obtaining exactly x successes in n independent trials[cite: 1].</p>
+    </div>
+
+    <div class="card">
+      <h3>Binomial Probability Formula</h3>
+      <div class="formula">
+        P(X = x) = C(n, x) × p<sup>x</sup> × (1 − p)<sup>n − x</sup>[cite: 1]
+      </div>
+
+      <div class="inputs">
+        <div>
+          <label for="n">Number of trials (n)</label>
+          <input type="number" id="n" min="0" step="1" value="20">
+        </div>
+        <div>
+          <label for="p">Probability of success (p)</label>
+          <input type="number" id="p" min="0" max="1" step="0.01" value="0.35">
+        </div>
+        <div>
+          <label for="x">Number of successes (x)</label>
+          <input type="number" id="x" min="0" step="1" value="7">
+        </div>
+      </div>
+
+      <button class="calculate" onclick="calculateBinomial()">Calculate Probability</button>
+
+      <div id="result" class="result"></div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <h4>Mean</h4>
+          <div id="mean" class="stat-value">7.00</div>
+        </div>
+        <div class="stat-card">
+          <h4>Variance</h4>
+          <div id="variance" class="stat-value">4.55</div>
+        </div>
+        <div class="stat-card">
+          <h4>Standard Deviation</h4>
+          <div id="stdDev" class="stat-value">2.13</div>
+        </div>
+        <div class="stat-card">
+          <h4>Second Moment E[X²]</h4>
+          <div id="secondMoment" class="stat-value">53.55</div>
+        </div>
+        <div class="stat-card">
+          <h4>Skewness</h4>
+          <div id="skewness" class="stat-value">0.14</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Binomial PMF Calculator</h3>
+        <p>For X ~ Binomial(n, p), calculate the probability of exactly k successes[cite: 1].</p>
+
+        <div class="formula">
+          P(X = k) = C(n,k) p<sup>k</sup> (1-p)<sup>n-k</sup>[cite: 1]
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="pmfK">Number of successes (k)</label>
+          <input type="number" id="pmfK" min="0" step="1" value="7">
+        </div>
+
+        <button class="calculate" onclick="calculatePMF()">Calculate PMF</button>
+
+        <div id="pmfResult" class="result" aria-live="polite"></div>
+
+        <p id="pmfMeaning" style="display:none; margin:15px 0 0; color:#6b7280;">
+          This result is the probability of getting exactly k successes in n independent trials[cite: 1].
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Binomial CDF Calculator</h3>
+        <p>Calculate the cumulative probability for the selected n and p[cite: 1].</p>
+
+        <div class="formula">
+          P(X &le; k) = &sum;<sub>x=0</sub><sup>k</sup> C(n,x) p<sup>x</sup> (1-p)<sup>n-x</sup>[cite: 1]
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="cdfK">Number of successes (k)</label>
+          <input type="number" id="cdfK" min="0" step="1" value="7">
+        </div>
+
+        <button class="calculate" onclick="calculateCDF()">Calculate CDF</button>
+
+        <div id="cdfResult" class="result" aria-live="polite"></div>
+
+        <p style="margin:15px 0 0; color:#6b7280;">
+          <strong>P(X &le; k)</strong> means the probability of getting k or fewer successes[cite: 1].
+        </p>
+      </div>
+
+      <div class="chart-container">
+        <h3>Binomial PMF Graph</h3>
+        <p class="chart-subtitle">Probability P(X) for X = 0, 1, 2, ..., n. The dashed line marks the mean[cite: 1].</p>
+        <svg id="pmfChart" role="img" aria-label="Binomial probability mass function bar chart"></svg>
+        <div id="pmfTooltip" class="chart-tooltip"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="poisson" class="page" style="display:none;">
+    <div class="hero">
+      <h2>Poisson Distribution</h2>
+      <p>Calculate the probability of a given number of events occurring in a fixed interval of time or space.</p>
+    </div>
+
+    <div class="card">
+      <h3>Poisson Probability Formula</h3>
+      <div class="formula">
+        P(X = x) = (e<sup>−&lambda;</sup> × &lambda;<sup>x</sup>) / x!
+      </div>
+
+      <div class="inputs">
+        <div>
+          <label for="lambda">Rate parameter (&lambda;)</label>
+          <input type="number" id="lambda" min="0.01" step="0.1" value="4.0">
+        </div>
+        <div>
+          <label for="poissonX">Number of events (x)</label>
+          <input type="number" id="poissonX" min="0" step="1" value="3">
+        </div>
+        <div></div>
+      </div>
+
+      <button class="calculate" onclick="calculatePoisson()">Calculate Probability</button>
+
+      <div id="poissonResult" class="result"></div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <h4>Mean</h4>
+          <div id="poissonMean" class="stat-value">4.00</div>
+        </div>
+        <div class="stat-card">
+          <h4>Variance</h4>
+          <div id="poissonVariance" class="stat-value">4.00</div>
+        </div>
+        <div class="stat-card">
+          <h4>Standard Deviation</h4>
+          <div id="poissonStdDev" class="stat-value">2.00</div>
+        </div>
+        <div class="stat-card">
+          <h4>Second Moment E[X²]</h4>
+          <div id="poissonSecondMoment" class="stat-value">20.00</div>
+        </div>
+        <div class="stat-card">
+          <h4>Skewness</h4>
+          <div id="poissonSkewness" class="stat-value">0.50</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Poisson PMF Calculator</h3>
+        <p>For X ~ Poisson(&lambda;), calculate the probability of exactly k events.</p>
+
+        <div class="formula">
+          P(X = k) = (e<sup>−&lambda;</sup> &lambda;<sup>k</sup>) / k!
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="poissonPmfK">Number of events (k)</label>
+          <input type="number" id="poissonPmfK" min="0" step="1" value="3">
+        </div>
+
+        <button class="calculate" onclick="calculatePoissonPMF()">Calculate PMF</button>
+
+        <div id="poissonPmfResult" class="result" aria-live="polite"></div>
+
+        <p id="poissonPmfMeaning" style="display:none; margin:15px 0 0; color:#6b7280;">
+          This result is the probability of getting exactly k events in the given interval.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Poisson CDF Calculator</h3>
+        <p>Calculate the cumulative probability for the selected &lambda;.</p>
+
+        <div class="formula">
+          P(X &le; k) = &sum;<sub>x=0</sub><sup>k</sup> (e<sup>−&lambda;</sup> &lambda;<sup>x</sup>) / x!
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="poissonCdfK">Number of events (k)</label>
+          <input type="number" id="poissonCdfK" min="0" step="1" value="3">
+        </div>
+
+        <button class="calculate" onclick="calculatePoissonCDF()">Calculate CDF</button>
+
+        <div id="poissonCdfResult" class="result" aria-live="polite"></div>
+
+        <p style="margin:15px 0 0; color:#6b7280;">
+          <strong>P(X &le; k)</strong> means the probability of getting k or fewer events.
+        </p>
+      </div>
+
+      <div class="chart-container">
+        <h3>Poisson PMF Graph</h3>
+        <p class="chart-subtitle">Probability P(X) for X = 0, 1, 2, ..., max. The dashed line marks the mean.</p>
+        <svg id="poissonPmfChart" role="img" aria-label="Poisson probability mass function bar chart"></svg>
+        <div id="poissonPmfTooltip" class="chart-tooltip"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="geometric" class="page" style="display:none;">
+    <div class="hero">
+      <h2>Geometric Distribution</h2>
+      <p>Calculate the probability of getting the first success on the x-th trial in independent Bernoulli trials.</p>
+    </div>
+
+    <div class="card">
+      <h3>Geometric Probability Formula</h3>
+      <div class="formula">
+        P(X = x) = (1 − p)<sup>x − 1</sup> × p
+      </div>
+
+      <div class="inputs">
+        <div>
+          <label for="geomP">Probability of success (p)</label>
+          <input type="number" id="geomP" min="0.01" max="1" step="0.01" value="0.30">
+        </div>
+        <div>
+          <label for="geomX">Trial of first success (x)</label>
+          <input type="number" id="geomX" min="1" step="1" value="3">
+        </div>
+        <div></div>
+      </div>
+
+      <button class="calculate" onclick="calculateGeometric()">Calculate Probability</button>
+
+      <div id="geomResult" class="result"></div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <h4>Mean</h4>
+          <div id="geomMean" class="stat-value">3.33</div>
+        </div>
+        <div class="stat-card">
+          <h4>Variance</h4>
+          <div id="geomVariance" class="stat-value">7.78</div>
+        </div>
+        <div class="stat-card">
+          <h4>Standard Deviation</h4>
+          <div id="geomStdDev" class="stat-value">2.79</div>
+        </div>
+        <div class="stat-card">
+          <h4>Second Moment E[X²]</h4>
+          <div id="geomSecondMoment" class="stat-value">18.89</div>
+        </div>
+        <div class="stat-card">
+          <h4>Skewness</h4>
+          <div id="geomSkewness" class="stat-value">1.87</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Geometric PMF Calculator</h3>
+        <p>For X ~ Geometric(p), calculate the probability of the first success occurring on trial k.</p>
+
+        <div class="formula">
+          P(X = k) = (1-p)<sup>k-1</sup> p
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="geomPmfK">Trial number (k)</label>
+          <input type="number" id="geomPmfK" min="1" step="1" value="3">
+        </div>
+
+        <button class="calculate" onclick="calculateGeometricPMF()">Calculate PMF</button>
+
+        <div id="geomPmfResult" class="result" aria-live="polite"></div>
+
+        <p id="geomPmfMeaning" style="display:none; margin:15px 0 0; color:#6b7280;">
+          This result is the probability that the first success happens exactly on trial k.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <h3>Geometric CDF Calculator</h3>
+        <p>Calculate the cumulative probability up to trial k.</p>
+
+        <div class="formula">
+          P(X &le; k) = &sum;<sub>x=1</sub><sup>k</sup> (1-p)<sup>x-1</sup> p
+        </div>
+
+        <div style="max-width:320px;">
+          <label for="geomCdfK">Trial number (k)</label>
+          <input type="number" id="geomCdfK" min="1" step="1" value="3">
+        </div>
+
+        <button class="calculate" onclick="calculateGeometricCDF()">Calculate CDF</button>
+
+        <div id="geomCdfResult" class="result" aria-live="polite"></div>
+
+        <p style="margin:15px 0 0; color:#6b7280;">
+          <strong>P(X &le; k)</strong> means the probability that the first success occurs on or before trial k.
+        </p>
+      </div>
+
+      <div class="chart-container">
+        <h3>Geometric PMF Graph</h3>
+        <p class="chart-subtitle">Probability P(X) for X = 1, 2, ..., max trials. The dashed line marks the mean.</p>
+        <svg id="geomPmfChart" role="img" aria-label="Geometric probability mass function bar chart"></svg>
+        <div id="geomPmfTooltip" class="chart-tooltip"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Undergraduate AIML Laboratory
+</footer>
+
+<script>
+  function showPage(pageId, button) {
+    document.querySelectorAll('.page').forEach(page => {
+      page.style.display = 'none';
+    });
+
+    document.getElementById(pageId).style.display = 'block';
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    button.classList.add('active');
+
+    if (pageId === 'poisson') {
+      drawPoissonChart();
+    } else if (pageId === 'geometric') {
+      drawGeometricChart();
+    } else if (pageId === 'binomial') {
+      drawPMFChart();
+    }
+  }
+
+  function factorial(num) {
+    let result = 1;
+    for (let i = 2; i <= num; i++) {
+      result *= i;
+    }
+    return result;
+  }
+
+  function combination(n, x) {
+    return factorial(n) / (factorial(x) * factorial(n - x));
+  }
+
+  function calculateBinomial() {
+    const n = Number(document.getElementById('n').value);
+    const p = Number(document.getElementById('p').value);
+    const x = Number(document.getElementById('x').value);
+    const result = document.getElementById('result');
+
+    if (!Number.isInteger(n) || n < 0) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter a valid number of trials.';
+      return;
+    }
+
+    if (p < 0 || p > 1 || isNaN(p)) {
+      result.style.display = 'block';
+      result.textContent = 'Probability of success must be between 0 and 1.';
+      return;
+    }
+
+    if (!Number.isInteger(x) || x < 0 || x > n) {
+      result.style.display = 'block';
+      result.textContent = 'Number of successes must be an integer between 0 and n.';
+      return;
+    }
+
+    const probability =
+      combination(n, x) *
+      Math.pow(p, x) *
+      Math.pow(1 - p, n - x);
+
+    const mean = n * p;
+    const variance = n * p * (1 - p);
+    const standardDeviation = Math.sqrt(variance);
+    const secondMoment = variance + Math.pow(mean, 2);
+    const skewness = standardDeviation === 0
+      ? 0
+      : (1 - 2 * p) / standardDeviation;
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${x}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    document.getElementById('mean').textContent = mean.toFixed(2);
+    document.getElementById('variance').textContent = variance.toFixed(2);
+    document.getElementById('stdDev').textContent = standardDeviation.toFixed(2);
+    document.getElementById('secondMoment').textContent = secondMoment.toFixed(2);
+    document.getElementById('skewness').textContent = skewness.toFixed(4);
+  }
+
+  function calculatePMF() {
+    const n = Number(document.getElementById('n').value);
+    const p = Number(document.getElementById('p').value);
+    const k = Number(document.getElementById('pmfK').value);
+    const result = document.getElementById('pmfResult');
+    const meaning = document.getElementById('pmfMeaning');
+
+    if (!Number.isInteger(n) || n < 0 || p < 0 || p > 1 || isNaN(p)) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter valid n and p values above.';
+      meaning.style.display = 'none';
+      return;
+    }
+
+    if (!Number.isInteger(k) || k < 0 || k > n) {
+      result.style.display = 'block';
+      result.textContent = `Invalid k. Enter an integer between 0 and ${n}.`;
+      meaning.style.display = 'none';
+      return;
+    }
+
+    const probability =
+      combination(n, k) *
+      Math.pow(p, k) *
+      Math.pow(1 - p, n - k);
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${k}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    meaning.style.display = 'block';
+  }
+
+  function calculateCDF() {
+    const n = Number(document.getElementById('n').value);
+    const p = Number(document.getElementById('p').value);
+    const k = Number(document.getElementById('cdfK').value);
+    const result = document.getElementById('cdfResult');
+
+    if (!Number.isInteger(n) || n < 0 || p < 0 || p > 1 || isNaN(p)) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter valid n and p values above.';
+      return;
+    }
+
+    if (!Number.isInteger(k) || k < 0 || k > n) {
+      result.style.display = 'block';
+      result.textContent = `Invalid k. Enter an integer between 0 and ${n}.`;
+      return;
+    }
+
+    let cdf = 0;
+    for (let x = 0; x <= k; x++) {
+      cdf += combination(n, x) *
+        Math.pow(p, x) *
+        Math.pow(1 - p, n - x);
+    }
+
+    cdf = Math.min(1, Math.max(0, cdf));
+    const greaterThanK = 1 - cdf;
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `<strong>P(X &le; ${k}) = ${cdf.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(cdf * 100).toFixed(2)}%` +
+      `<br><br><strong>P(X &gt; ${k}) = ${greaterThanK.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(greaterThanK * 100).toFixed(2)}%`;
+  }
+
+  function drawPMFChart() {
+    const n = Number(document.getElementById('n').value);
+    const p = Number(document.getElementById('p').value);
+    const svg = document.getElementById('pmfChart');
+    const tooltip = document.getElementById('pmfTooltip');
+
+    if (!svg || !Number.isInteger(n) || n < 0 || p < 0 || p > 1 || isNaN(p)) {
+      return;
+    }
+
+    const width = Math.max(svg.clientWidth || 760, 520);
+    const height = 360;
+    const margin = { top: 28, right: 24, bottom: 52, left: 58 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.innerHTML = '';
+
+    const probabilities = [];
+    for (let x = 0; x <= n; x++) {
+      probabilities.push(
+        combination(n, x) *
+        Math.pow(p, x) *
+        Math.pow(1 - p, n - x)
+      );
+    }
+
+    const maxProbability = Math.max(...probabilities, 0.01);
+    const yMax = maxProbability * 1.15;
+    const mean = n * p;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const make = (tag, attrs = {}) => {
+      const el = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    };
+
+    const tickCount = 4;
+    for (let i = 0; i <= tickCount; i++) {
+      const value = yMax * (i / tickCount);
+      const y = margin.top + plotHeight - (value / yMax) * plotHeight;
+
+      svg.appendChild(make('line', {
+        x1: margin.left, y1: y, x2: width - margin.right, y2: y,
+        stroke: '#e5e7eb', 'stroke-width': 1
+      }));
+
+      const label = make('text', {
+        x: margin.left - 9, y: y + 4,
+        'text-anchor': 'end', 'font-size': 11, fill: '#6b7280'
+      });
+      label.textContent = value.toFixed(3);
+      svg.appendChild(label);
+    }
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top + plotHeight,
+      x2: width - margin.right, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top,
+      x2: margin.left, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    const yTitle = make('text', {
+      x: 16, y: margin.top + plotHeight / 2,
+      transform: `rotate(-90 16 ${margin.top + plotHeight / 2})`,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    yTitle.textContent = 'Probability P(X)';
+    svg.appendChild(yTitle);
+
+    const xTitle = make('text', {
+      x: margin.left + plotWidth / 2, y: height - 8,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    xTitle.textContent = 'Number of successes X';
+    svg.appendChild(xTitle);
+
+    const meanX = margin.left + ((mean + 0.5) / (n + 1)) * plotWidth;
+    svg.appendChild(make('line', {
+      x1: meanX, y1: margin.top, x2: meanX, y2: margin.top + plotHeight,
+      stroke: '#4f46e5', 'stroke-width': 2, 'stroke-dasharray': '7 5'
+    }));
+
+    const meanLabel = make('text', {
+      x: Math.min(meanX + 5, width - margin.right - 60),
+      y: margin.top + 14,
+      'font-size': 11, fill: '#4338ca', 'font-weight': '600'
+    });
+    meanLabel.textContent = `Mean = ${mean.toFixed(2)}`;
+    svg.appendChild(meanLabel);
+
+    const slotWidth = plotWidth / (n + 1);
+    const barWidth = Math.max(4, Math.min(34, slotWidth * 0.72));
+
+    probabilities.forEach((probability, x) => {
+      const barHeight = (probability / yMax) * plotHeight;
+      const barX = margin.left + x * slotWidth + (slotWidth - barWidth) / 2;
+      const barY = margin.top + plotHeight - barHeight;
+
+      const bar = make('rect', {
+        x: barX, y: barY, width: barWidth, height: Math.max(barHeight, 1),
+        rx: 3, fill: '#6366f1', opacity: 0.88,
+        tabindex: 0,
+        role: 'img',
+        'aria-label': `X = ${x}, P(X=${x}) = ${probability.toFixed(6)}`
+      });
+
+      const showTooltip = (event) => {
+        tooltip.innerHTML = `X = ${x}<br>P(X=${x}) = ${probability.toFixed(6)}`;
+        tooltip.style.display = 'block';
+        const clientX = event.clientX ?? 0;
+        const clientY = event.clientY ?? 0;
+        tooltip.style.left = `${Math.min(clientX + 12, window.innerWidth - 190)}px`;
+        tooltip.style.top = `${Math.max(clientY - 55, 8)}px`;
+      };
+
+      bar.addEventListener('mouseenter', showTooltip);
+      bar.addEventListener('mousemove', showTooltip);
+      bar.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      bar.addEventListener('focus', () => {
+        const rect = bar.getBoundingClientRect();
+        showTooltip({ clientX: rect.left + rect.width / 2, clientY: rect.top });
+      });
+      bar.addEventListener('blur', () => tooltip.style.display = 'none');
+
+      svg.appendChild(bar);
+
+      const labelEvery = n <= 20 ? 1 : Math.ceil(n / 20);
+      if (x % labelEvery === 0 || x === n) {
+        const xLabel = make('text', {
+          x: barX + barWidth / 2,
+          y: margin.top + plotHeight + 18,
+          'text-anchor': 'middle', 'font-size': 10, fill: '#6b7280'
+        });
+        xLabel.textContent = x;
+        svg.appendChild(xLabel);
+      }
+    });
+  }
+
+  // POISSON LOGIC
+  function calculatePoisson() {
+    const lam = Number(document.getElementById('lambda').value);
+    const x = Number(document.getElementById('poissonX').value);
+    const result = document.getElementById('poissonResult');
+
+    if (lam <= 0 || isNaN(lam)) {
+      result.style.display = 'block';
+      result.textContent = 'Rate parameter (&lambda;) must be greater than 0.';
+      return;
+    }
+
+    if (!Number.isInteger(x) || x < 0) {
+      result.style.display = 'block';
+      result.textContent = 'Number of events must be a non-negative integer.';
+      return;
+    }
+
+    const probability = (Math.exp(-lam) * Math.pow(lam, x)) / factorial(x);
+
+    const mean = lam;
+    const variance = lam;
+    const standardDeviation = Math.sqrt(lam);
+    const secondMoment = variance + Math.pow(mean, 2);
+    const skewness = 1 / Math.sqrt(lam);
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${x}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    document.getElementById('poissonMean').textContent = mean.toFixed(2);
+    document.getElementById('poissonVariance').textContent = variance.toFixed(2);
+    document.getElementById('poissonStdDev').textContent = standardDeviation.toFixed(2);
+    document.getElementById('poissonSecondMoment').textContent = secondMoment.toFixed(2);
+    document.getElementById('poissonSkewness').textContent = skewness.toFixed(4);
+  }
+
+  function calculatePoissonPMF() {
+    const lam = Number(document.getElementById('lambda').value);
+    const k = Number(document.getElementById('poissonPmfK').value);
+    const result = document.getElementById('poissonPmfResult');
+    const meaning = document.getElementById('poissonPmfMeaning');
+
+    if (lam <= 0 || isNaN(lam) || !Number.isInteger(k) || k < 0) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter a valid rate parameter and non-negative integer k.';
+      meaning.style.display = 'none';
+      return;
+    }
+
+    const probability = (Math.exp(-lam) * Math.pow(lam, k)) / factorial(k);
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${k}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    meaning.style.display = 'block';
+  }
+
+  function calculatePoissonCDF() {
+    const lam = Number(document.getElementById('lambda').value);
+    const k = Number(document.getElementById('poissonCdfK').value);
+    const result = document.getElementById('poissonCdfResult');
+
+    if (lam <= 0 || isNaN(lam) || !Number.isInteger(k) || k < 0) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter a valid rate parameter and non-negative integer k.';
+      return;
+    }
+
+    let cdf = 0;
+    for (let x = 0; x <= k; x++) {
+      cdf += (Math.exp(-lam) * Math.pow(lam, x)) / factorial(x);
+    }
+
+    cdf = Math.min(1, Math.max(0, cdf));
+    const greaterThanK = 1 - cdf;
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `<strong>P(X &le; ${k}) = ${cdf.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(cdf * 100).toFixed(2)}%` +
+      `<br><br><strong>P(X &gt; ${k}) = ${greaterThanK.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(greaterThanK * 100).toFixed(2)}%`;
+  }
+
+  function drawPoissonChart() {
+    const lam = Number(document.getElementById('lambda').value);
+    const svg = document.getElementById('poissonPmfChart');
+    const tooltip = document.getElementById('poissonPmfTooltip');
+
+    if (!svg || lam <= 0 || isNaN(lam)) {
+      return;
+    }
+
+    const maxX = Math.max(15, Math.ceil(lam + 4 * Math.sqrt(lam)));
+    const width = Math.max(svg.clientWidth || 760, 520);
+    const height = 360;
+    const margin = { top: 28, right: 24, bottom: 52, left: 58 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.innerHTML = '';
+
+    const probabilities = [];
+    for (let x = 0; x <= maxX; x++) {
+      probabilities.push((Math.exp(-lam) * Math.pow(lam, x)) / factorial(x));
+    }
+
+    const maxProbability = Math.max(...probabilities, 0.01);
+    const yMax = maxProbability * 1.15;
+    const mean = lam;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const make = (tag, attrs = {}) => {
+      const el = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    };
+
+    const tickCount = 4;
+    for (let i = 0; i <= tickCount; i++) {
+      const value = yMax * (i / tickCount);
+      const y = margin.top + plotHeight - (value / yMax) * plotHeight;
+
+      svg.appendChild(make('line', {
+        x1: margin.left, y1: y, x2: width - margin.right, y2: y,
+        stroke: '#e5e7eb', 'stroke-width': 1
+      }));
+
+      const label = make('text', {
+        x: margin.left - 9, y: y + 4,
+        'text-anchor': 'end', 'font-size': 11, fill: '#6b7280'
+      });
+      label.textContent = value.toFixed(3);
+      svg.appendChild(label);
+    }
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top + plotHeight,
+      x2: width - margin.right, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top,
+      x2: margin.left, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    const yTitle = make('text', {
+      x: 16, y: margin.top + plotHeight / 2,
+      transform: `rotate(-90 16 ${margin.top + plotHeight / 2})`,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    yTitle.textContent = 'Probability P(X)';
+    svg.appendChild(yTitle);
+
+    const xTitle = make('text', {
+      x: margin.left + plotWidth / 2, y: height - 8,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    xTitle.textContent = 'Number of events X';
+    svg.appendChild(xTitle);
+
+    const meanX = margin.left + ((mean + 0.5) / (maxX + 1)) * plotWidth;
+    svg.appendChild(make('line', {
+      x1: meanX, y1: margin.top, x2: meanX, y2: margin.top + plotHeight,
+      stroke: '#4f46e5', 'stroke-width': 2, 'stroke-dasharray': '7 5'
+    }));
+
+    const meanLabel = make('text', {
+      x: Math.min(meanX + 5, width - margin.right - 60),
+      y: margin.top + 14,
+      'font-size': 11, fill: '#4338ca', 'font-weight': '600'
+    });
+    meanLabel.textContent = `Mean = ${mean.toFixed(2)}`;
+    svg.appendChild(meanLabel);
+
+    const slotWidth = plotWidth / (maxX + 1);
+    const barWidth = Math.max(4, Math.min(34, slotWidth * 0.72));
+
+    probabilities.forEach((probability, x) => {
+      const barHeight = (probability / yMax) * plotHeight;
+      const barX = margin.left + x * slotWidth + (slotWidth - barWidth) / 2;
+      const barY = margin.top + plotHeight - barHeight;
+
+      const bar = make('rect', {
+        x: barX, y: barY, width: barWidth, height: Math.max(barHeight, 1),
+        rx: 3, fill: '#6366f1', opacity: 0.88,
+        tabindex: 0,
+        role: 'img',
+        'aria-label': `X = ${x}, P(X=${x}) = ${probability.toFixed(6)}`
+      });
+
+      const showTooltip = (event) => {
+        tooltip.innerHTML = `X = ${x}<br>P(X=${x}) = ${probability.toFixed(6)}`;
+        tooltip.style.display = 'block';
+        const clientX = event.clientX ?? 0;
+        const clientY = event.clientY ?? 0;
+        tooltip.style.left = `${Math.min(clientX + 12, window.innerWidth - 190)}px`;
+        tooltip.style.top = `${Math.max(clientY - 55, 8)}px`;
+      };
+
+      bar.addEventListener('mouseenter', showTooltip);
+      bar.addEventListener('mousemove', showTooltip);
+      bar.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      bar.addEventListener('focus', () => {
+        const rect = bar.getBoundingClientRect();
+        showTooltip({ clientX: rect.left + rect.width / 2, clientY: rect.top });
+      });
+      bar.addEventListener('blur', () => tooltip.style.display = 'none');
+
+      svg.appendChild(bar);
+
+      const labelEvery = maxX <= 20 ? 1 : Math.ceil(maxX / 20);
+      if (x % labelEvery === 0 || x === maxX) {
+        const xLabel = make('text', {
+          x: barX + barWidth / 2,
+          y: margin.top + plotHeight + 18,
+          'text-anchor': 'middle', 'font-size': 10, fill: '#6b7280'
+        });
+        xLabel.textContent = x;
+        svg.appendChild(xLabel);
+      }
+    });
+  }
+
+  // GEOMETRIC LOGIC
+  function calculateGeometric() {
+    const p = Number(document.getElementById('geomP').value);
+    const x = Number(document.getElementById('geomX').value);
+    const result = document.getElementById('geomResult');
+
+    if (p <= 0 || p > 1 || isNaN(p)) {
+      result.style.display = 'block';
+      result.textContent = 'Probability of success p must be between 0 (exclusive) and 1.';
+      return;
+    }
+
+    if (!Number.isInteger(x) || x < 1) {
+      result.style.display = 'block';
+      result.textContent = 'Trial number x must be an integer >= 1.';
+      return;
+    }
+
+    const probability = Math.pow(1 - p, x - 1) * p;
+
+    const mean = 1 / p;
+    const variance = (1 - p) / Math.pow(p, 2);
+    const standardDeviation = Math.sqrt(variance);
+    const secondMoment = variance + Math.pow(mean, 2);
+    const skewness = (2 - p) / Math.sqrt(1 - p);
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${x}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    document.getElementById('geomMean').textContent = mean.toFixed(2);
+    document.getElementById('geomVariance').textContent = variance.toFixed(2);
+    document.getElementById('geomStdDev').textContent = standardDeviation.toFixed(2);
+    document.getElementById('geomSecondMoment').textContent = secondMoment.toFixed(2);
+    document.getElementById('geomSkewness').textContent = skewness.toFixed(4);
+  }
+
+  function calculateGeometricPMF() {
+    const p = Number(document.getElementById('geomP').value);
+    const k = Number(document.getElementById('geomPmfK').value);
+    const result = document.getElementById('geomPmfResult');
+    const meaning = document.getElementById('geomPmfMeaning');
+
+    if (p <= 0 || p > 1 || isNaN(p) || !Number.isInteger(k) || k < 1) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter a valid probability p and integer trial k >= 1.';
+      meaning.style.display = 'none';
+      return;
+    }
+
+    const probability = Math.pow(1 - p, k - 1) * p;
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `P(X = ${k}) = <strong>${probability.toFixed(6)}</strong>` +
+      `<br>Percentage = <strong>${(probability * 100).toFixed(2)}%</strong>`;
+
+    meaning.style.display = 'block';
+  }
+
+  function calculateGeometricCDF() {
+    const p = Number(document.getElementById('geomP').value);
+    const k = Number(document.getElementById('geomCdfK').value);
+    const result = document.getElementById('geomCdfResult');
+
+    if (p <= 0 || p > 1 || isNaN(p) || !Number.isInteger(k) || k < 1) {
+      result.style.display = 'block';
+      result.textContent = 'Please enter a valid probability p and integer trial k >= 1.';
+      return;
+    }
+
+    let cdf = 0;
+    for (let x = 1; x <= k; x++) {
+      cdf += Math.pow(1 - p, x - 1) * p;
+    }
+
+    cdf = Math.min(1, Math.max(0, cdf));
+    const greaterThanK = 1 - cdf;
+
+    result.style.display = 'block';
+    result.innerHTML =
+      `<strong>P(X &le; ${k}) = ${cdf.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(cdf * 100).toFixed(2)}%` +
+      `<br><br><strong>P(X &gt; ${k}) = ${greaterThanK.toFixed(6)}</strong>` +
+      `<br>Percentage = ${(greaterThanK * 100).toFixed(2)}%`;
+  }
+
+  function drawGeometricChart() {
+    const p = Number(document.getElementById('geomP').value);
+    const svg = document.getElementById('geomPmfChart');
+    const tooltip = document.getElementById('geomPmfTooltip');
+
+    if (!svg || p <= 0 || p > 1 || isNaN(p)) {
+      return;
+    }
+
+    const maxX = Math.max(15, Math.ceil(Math.log(0.005) / Math.log(1 - p)));
+    const width = Math.max(svg.clientWidth || 760, 520);
+    const height = 360;
+    const margin = { top: 28, right: 24, bottom: 52, left: 58 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.innerHTML = '';
+
+    const probabilities = [];
+    for (let x = 1; x <= maxX; x++) {
+      probabilities.push(Math.pow(1 - p, x - 1) * p);
+    }
+
+    const maxProbability = Math.max(...probabilities, 0.01);
+    const yMax = maxProbability * 1.15;
+    const mean = 1 / p;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const make = (tag, attrs = {}) => {
+      const el = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    };
+
+    const tickCount = 4;
+    for (let i = 0; i <= tickCount; i++) {
+      const value = yMax * (i / tickCount);
+      const y = margin.top + plotHeight - (value / yMax) * plotHeight;
+
+      svg.appendChild(make('line', {
+        x1: margin.left, y1: y, x2: width - margin.right, y2: y,
+        stroke: '#e5e7eb', 'stroke-width': 1
+      }));
+
+      const label = make('text', {
+        x: margin.left - 9, y: y + 4,
+        'text-anchor': 'end', 'font-size': 11, fill: '#6b7280'
+      });
+      label.textContent = value.toFixed(3);
+      svg.appendChild(label);
+    }
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top + plotHeight,
+      x2: width - margin.right, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    svg.appendChild(make('line', {
+      x1: margin.left, y1: margin.top,
+      x2: margin.left, y2: margin.top + plotHeight,
+      stroke: '#9ca3af', 'stroke-width': 1.2
+    }));
+
+    const yTitle = make('text', {
+      x: 16, y: margin.top + plotHeight / 2,
+      transform: `rotate(-90 16 ${margin.top + plotHeight / 2})`,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    yTitle.textContent = 'Probability P(X)';
+    svg.appendChild(yTitle);
+
+    const xTitle = make('text', {
+      x: margin.left + plotWidth / 2, y: height - 8,
+      'text-anchor': 'middle', 'font-size': 12, fill: '#4b5563'
+    });
+    xTitle.textContent = 'Trial number X';
+    svg.appendChild(xTitle);
+
+    const meanX = margin.left + ((mean - 0.5) / maxX) * plotWidth;
+    svg.appendChild(make('line', {
+      x1: meanX, y1: margin.top, x2: meanX, y2: margin.top + plotHeight,
+      stroke: '#4f46e5', 'stroke-width': 2, 'stroke-dasharray': '7 5'
+    }));
+
+    const meanLabel = make('text', {
+      x: Math.min(meanX + 5, width - margin.right - 60),
+      y: margin.top + 14,
+      'font-size': 11, fill: '#4338ca', 'font-weight': '600'
+    });
+    meanLabel.textContent = `Mean = ${mean.toFixed(2)}`;
+    svg.appendChild(meanLabel);
+
+    const slotWidth = plotWidth / maxX;
+    const barWidth = Math.max(4, Math.min(34, slotWidth * 0.72));
+
+    probabilities.forEach((probability, idx) => {
+      const x = idx + 1;
+      const barHeight = (probability / yMax) * plotHeight;
+      const barX = margin.left + idx * slotWidth + (slotWidth - barWidth) / 2;
+      const barY = margin.top + plotHeight - barHeight;
+
+      const bar = make('rect', {
+        x: barX, y: barY, width: barWidth, height: Math.max(barHeight, 1),
+        rx: 3, fill: '#6366f1', opacity: 0.88,
+        tabindex: 0,
+        role: 'img',
+        'aria-label': `X = ${x}, P(X=${x}) = ${probability.toFixed(6)}`
+      });
+
+      const showTooltip = (event) => {
+        tooltip.innerHTML = `X = ${x}<br>P(X=${x}) = ${probability.toFixed(6)}`;
+        tooltip.style.display = 'block';
+        const clientX = event.clientX ?? 0;
+        const clientY = event.clientY ?? 0;
+        tooltip.style.left = `${Math.min(clientX + 12, window.innerWidth - 190)}px`;
+        tooltip.style.top = `${Math.max(clientY - 55, 8)}px`;
+      };
+
+      bar.addEventListener('mouseenter', showTooltip);
+      bar.addEventListener('mousemove', showTooltip);
+      bar.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      bar.addEventListener('focus', () => {
+        const rect = bar.getBoundingClientRect();
+        showTooltip({ clientX: rect.left + rect.width / 2, clientY: rect.top });
+      });
+      bar.addEventListener('blur', () => tooltip.style.display = 'none');
+
+      svg.appendChild(bar);
+
+      const labelEvery = maxX <= 20 ? 1 : Math.ceil(maxX / 20);
+      if (x % labelEvery === 0 || x === 1 || x === maxX) {
+        const xLabel = make('text', {
+          x: barX + barWidth / 2,
+          y: margin.top + plotHeight + 18,
+          'text-anchor': 'middle', 'font-size': 10, fill: '#6b7280'
+        });
+        xLabel.textContent = x;
+        svg.appendChild(xLabel);
+      }
+    });
+  }
+
+  ['lambda', 'poissonX'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      drawPoissonChart();
+      calculatePoisson();
+    });
+    document.getElementById(id).addEventListener('change', () => {
+      drawPoissonChart();
+      calculatePoisson();
+    });
+  });
+
+  ['geomP', 'geomX'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      drawGeometricChart();
+      calculateGeometric();
+    });
+    document.getElementById(id).addEventListener('change', () => {
+      drawGeometricChart();
+      calculateGeometric();
+    });
+  });
+
+  ['n', 'p'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      drawPMFChart();
+      calculateBinomial();
+    });
+    document.getElementById(id).addEventListener('change', () => {
+      drawPMFChart();
+      calculateBinomial();
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    drawPMFChart();
+    drawPoissonChart();
+    drawGeometricChart();
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    calculateBinomial();
+    drawPMFChart();
+    calculatePoisson();
+    drawPoissonChart();
+    calculateGeometric();
+    drawGeometricChart();
+  });
+</script>
+
+</body>
+</html>
